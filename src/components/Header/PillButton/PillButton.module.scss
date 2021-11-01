@@ -1,0 +1,25 @@
+.btn {
+  height: 50px;
+  border: 0;
+  cursor: pointer;
+
+  font-size: 20px;
+  border-radius: 30px;
+  padding: 10px 20px;
+  margin-left: 15px;
+}
+
+.border {
+  background-color: white;
+  border: 1px solid #7A36F9;
+  color: #7A36F9;
+}
+
+.noBorder {
+  background-image: linear-gradient(#7A36F9 0%, #7A36F9 51%, #6524e0 100%);
+  color: white;
+}
+
+.btn:first-child{
+  margin: 0;
+}
