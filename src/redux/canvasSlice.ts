@@ -5,13 +5,15 @@ export interface CanvasState {
   lineWidth: number;
   redoList: string[];
   undoList: string[];
+  modalState: boolean;
 }
 
 const initialState: CanvasState = {
   penColor: '#001622',
   lineWidth: 5,
   redoList: [],
-  undoList: []
+  undoList: [],
+  modalState: false
 }
 
 export const canvasSlice = createSlice({
@@ -27,10 +29,13 @@ export const canvasSlice = createSlice({
     setUndoList: (state, action: PayloadAction<string[]>) => {
       state.undoList = action.payload
     },
+    setModalState: (state, action: PayloadAction<boolean>) => {
+      state.modalState = action.payload
+    }
   }
 });
 
 // Action creators are generated for each case reducer function
-export const { changePenColor, setRedoList, setUndoList } = canvasSlice.actions;
+export const { changePenColor, setRedoList, setUndoList, setModalState } = canvasSlice.actions;
 
 export default canvasSlice.reducer;

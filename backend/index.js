@@ -10,7 +10,13 @@ const io = require("socket.io")(server, {
 
 io.on('connection', (socket) => {
 
+  console.log(socket.id);
+
   socket.join("ROOM1");
+
+  socket.on('conn', (url) => {
+    socket.to("ROOM1").emit("connected", url);
+  });
 
   socket.on('start draw', ([x, y]) => {
     socket.to("ROOM1").emit("start drawing", [x, y]);

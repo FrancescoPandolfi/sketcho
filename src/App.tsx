@@ -6,17 +6,28 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./redux/store";
 import {setRedoList, setUndoList} from "./redux/canvasSlice";
+import Modal from "./components/Modal/Modal";
 
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const ctx = useRef<CanvasRenderingContext2D | null>(null)
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const [socketId, setSocketId] = useState<string>();
+
   const canvasState = useSelector((state: RootState) => state.canvas);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socket.on('connect', () => console.log('connected'))
+    socket.on('connect', () => {
+      setSocketId(socket.id);
+      console.log(socket.id);
+    })
+    socket.emit('conn', canvasRef.current?.toDataURL());
+
+    socket.on("connected", (url) => {
+      console.log(url);
+    });
     socket.on("start drawing", ([x, y]) => {
       startDrawing(x, y);
     });
@@ -165,6 +176,7 @@ function App() {
 
   return (
     <Router>
+      {canvasState.modalState && <Modal />}
       <Header
         downloadSketch={downloadSketch}
         cleanCanvas={cleanCanvas}
