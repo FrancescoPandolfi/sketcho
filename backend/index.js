@@ -12,7 +12,11 @@ io.on('connection', (socket) => {
 
   console.log(socket.id);
 
-  socket.join("ROOM1");
+  // socket.join("ROOM1");
+
+  socket.on('join room', (url) => {
+    socket.join("ROOM1");
+  });
 
   socket.on('conn', (url) => {
     socket.to("ROOM1").emit("connected", url);

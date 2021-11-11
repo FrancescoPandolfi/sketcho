@@ -6,6 +6,7 @@ import PillButton from "./PillButton/PillButton";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {setModalState} from "../../redux/canvasSlice";
+import Logo from "../../img/risorsa-1.svg";
 
 export interface props {
   downloadSketch: () => void;
@@ -20,7 +21,7 @@ const Header = ({downloadSketch, cleanCanvas, undo, redo}: props) => {
 
   return (
     <div className={css.toolbar}>
-      <div className={css.icon}>✍️</div>
+      <div className={css.logo}><img src={Logo} alt="Draw with me"/></div>
       <RoundButton disabled={canvasState.undoList.length === 0}  action={undo} icon={<CgUndo/>}/>
       <RoundButton disabled={canvasState.redoList.length === 0} action={redo} icon={<CgRedo/>}/>
       <RoundButton action={cleanCanvas} icon={<CgErase/>}/>

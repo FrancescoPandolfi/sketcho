@@ -11,7 +11,8 @@ const Modal: FC = () => {
   return (
     <div className={css.backdrop}>
       <div className={css.modalContainer}>
-        <button onClick={() => dispatch(setModalState(!canvasState.modalState))}>Chiudi</button>
+        <p>{canvasState.socketID}</p>
+        <button onClick={() => dispatch(setModalState(!canvasState.modalState))}>Create</button>
       </div>
 
     </div>

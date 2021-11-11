@@ -7,4 +7,31 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  animation-name: backdrop;
+  animation-duration: .4s;
+  animation-timing-function: ease;
 }
+
+.modalContainer {
+  background-color: white;
+  padding: 15px;
+  width: 300px;
+  height: 200px;
+  text-align: center;
+  border-radius: 25px;
+  animation-name: modal;
+  animation-duration: .4s;
+  animation-timing-function: ease;
+}
+
+
+@keyframes backdrop {
+  from {background-color: rgba(0, 0, 0, 0);}
+  to {background-color: rgba(0, 0, 0, 0.5);}
+}
+
+@keyframes modal {
+  from {transform: translate(0, 10px)}
+  to {transform: translate(0, 0)}
+}
+

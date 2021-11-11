@@ -1,26 +1,23 @@
-import {useEffect, useRef, useState} from 'react';
 import Header from "./components/Header/Header";
 import Colorbar from "./components/ColorBar/Colorbar";
-import socket from "./config/socket";
-import {BrowserRouter as Router} from 'react-router-dom';
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./redux/store";
-import {setRedoList, setUndoList} from "./redux/canvasSlice";
 import Modal from "./components/Modal/Modal";
+import React, {useEffect, useRef, useState} from "react";
+import socket from "./config/socket";
+import {setRedoList, setSocketId, setUndoList} from "./redux/canvasSlice";
 
 
 function App() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const ctx = useRef<CanvasRenderingContext2D | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const ctx = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  const [socketId, setSocketId] = useState<string>();
-
   const canvasState = useSelector((state: RootState) => state.canvas);
   const dispatch = useDispatch();
 
   useEffect(() => {
     socket.on('connect', () => {
-      setSocketId(socket.id);
+      dispatch(setSocketId(socket.id));
       console.log(socket.id);
     })
     socket.emit('conn', canvasRef.current?.toDataURL());
@@ -98,16 +95,16 @@ function App() {
       this.restoreState(canvas!, ctx!);
     },
     undoState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-        const undoUrl = canvasState.undoList.filter((v, i) => i === canvasState.undoList.length - 1)[0];
-        dispatch(setUndoList(canvasState.undoList.filter((v, i) => i !== canvasState.undoList.length - 1)));
-        dispatch(setRedoList([...canvasState.redoList, c.toDataURL()]));
-        this.renderImage(undoUrl, ctx);
+      const undoUrl = canvasState.undoList.filter((v, i) => i === canvasState.undoList.length - 1)[0];
+      dispatch(setUndoList(canvasState.undoList.filter((v, i) => i !== canvasState.undoList.length - 1)));
+      dispatch(setRedoList([...canvasState.redoList, c.toDataURL()]));
+      this.renderImage(undoUrl, ctx);
     },
     restoreState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-        const redoUrl = canvasState.redoList.filter((value, i) => i === canvasState.redoList.length - 1)[0];
-        dispatch(setUndoList([...canvasState.undoList, c.toDataURL()]));
-        dispatch(setRedoList(canvasState.redoList.filter((v, i) => i !== canvasState.redoList.length - 1)));
-        this.renderImage(redoUrl, ctx);
+      const redoUrl = canvasState.redoList.filter((value, i) => i === canvasState.redoList.length - 1)[0];
+      dispatch(setUndoList([...canvasState.undoList, c.toDataURL()]));
+      dispatch(setRedoList(canvasState.redoList.filter((v, i) => i !== canvasState.redoList.length - 1)));
+      this.renderImage(redoUrl, ctx);
     },
     renderImage: (undoUrl: string, ctx: CanvasRenderingContext2D) => {
       const img: HTMLImageElement = document.createElement('img');
@@ -119,7 +116,6 @@ function App() {
       }
     }
   }
-
 
   /** Start drawing */
   const onStartDrawing = ({nativeEvent}: any) => {
@@ -173,10 +169,9 @@ function App() {
     link.href = ctx.current!.canvas.toDataURL();
     link.click();
   }
-
   return (
-    <Router>
-      {canvasState.modalState && <Modal />}
+    <>
+      {canvasState.modalState && <Modal/>}
       <Header
         downloadSketch={downloadSketch}
         cleanCanvas={cleanCanvas}
@@ -191,7 +186,7 @@ function App() {
         ref={canvasRef}
       />
       <Colorbar/>
-    </Router>
+    </>
   );
 }
 
