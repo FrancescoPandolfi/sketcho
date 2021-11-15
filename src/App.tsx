@@ -2,10 +2,11 @@ import Header from "./components/Header/Header";
 import Colorbar from "./components/ColorBar/Colorbar";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./redux/store";
-import Modal from "./components/Modal/Modal";
+import CreateModal from "./components/Modal/CreateModal";
 import React, {useEffect, useRef, useState} from "react";
 import socket from "./config/socket";
-import {setRedoList, setSocketId, setUndoList} from "./redux/canvasSlice";
+import {setRedoList, setUndoList} from "./redux/canvasSlice";
+import JoinModal from "./components/Modal/JoinModal";
 
 
 function App() {
@@ -17,14 +18,8 @@ function App() {
 
   useEffect(() => {
     socket.on('connect', () => {
-      dispatch(setSocketId(socket.id));
-      console.log(socket.id);
-    })
-    socket.emit('conn', canvasRef.current?.toDataURL());
+      console.log('connected')});
 
-    socket.on("connected", (url) => {
-      console.log(url);
-    });
     socket.on("start drawing", ([x, y]) => {
       startDrawing(x, y);
     });
@@ -33,6 +28,9 @@ function App() {
     });
     socket.on("finish drawing", () => {
       finishDrawing();
+    });
+    socket.on("cleaning canvas", () => {
+      cleanCanvas();
     });
   }, []);
 
@@ -44,9 +42,7 @@ function App() {
     canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
-
     ctx.current = canvas.getContext('2d');
-
   }, []);
 
   /** Setup line configuration*/
@@ -83,6 +79,7 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   });
 
+  /** Manage draw history */
   const history = {
     saveState: function (c: HTMLCanvasElement | null) {
       dispatch(setUndoList([...canvasState.undoList, c!.toDataURL()]));
@@ -120,7 +117,7 @@ function App() {
   /** Start drawing */
   const onStartDrawing = ({nativeEvent}: any) => {
     const {offsetX, offsetY} = nativeEvent;
-    socket.emit('start draw', [offsetX, offsetY]);
+    socket.emit('start draw', [offsetX, offsetY, canvasState.roomId]);
     startDrawing(offsetX, offsetY);
   }
   const startDrawing = (offsetX: number, offsetY: number) => {
@@ -134,10 +131,9 @@ function App() {
   const onDraw = ({nativeEvent}: any) => {
     if (!isDrawing) return;
     const {offsetX, offsetY} = nativeEvent;
-    socket.emit('draw', [offsetX, offsetY]);
+    socket.emit('draw', [offsetX, offsetY, canvasState.roomId]);
     draw(offsetX, offsetY);
   }
-
   const draw = (offsetX: number, offsetY: number) => {
     ctx.current!.lineTo(offsetX, offsetY);
     ctx.current!.stroke();
@@ -145,16 +141,21 @@ function App() {
 
   /** Finish drawing */
   const onFinishDrawing = () => {
-    socket.emit('finish draw');
+    socket.emit('finish draw', canvasState.roomId);
     finishDrawing();
   }
-
   const finishDrawing = () => {
     ctx.current?.closePath();
     setIsDrawing(false);
   }
 
   /** Clean the Canvas */
+
+  const onCleanCanvas = () => {
+    socket.emit('clean canvas', canvasState.roomId);
+    cleanCanvas();
+  }
+
   const cleanCanvas = () => {
     ctx.current!.fillStyle = '#FFFFFF';
     ctx.current!.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -171,10 +172,11 @@ function App() {
   }
   return (
     <>
-      {canvasState.modalState && <Modal/>}
+      {canvasState.createModalState && <CreateModal/>}
+      {canvasState.joinModalState && <JoinModal/>}
       <Header
         downloadSketch={downloadSketch}
-        cleanCanvas={cleanCanvas}
+        cleanCanvas={onCleanCanvas}
         undo={() => history.undo(canvasRef.current, ctx.current)}
         redo={() => history.redo(canvasRef.current, ctx.current)}
       />

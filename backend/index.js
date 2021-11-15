@@ -10,26 +10,20 @@ const io = require("socket.io")(server, {
 
 io.on('connection', (socket) => {
 
-  console.log(socket.id);
-
-  // socket.join("ROOM1");
-
-  socket.on('join room', (url) => {
-    socket.join("ROOM1");
+  socket.on('join room', (roomId) => {
+    socket.join(roomId);
   });
-
-  socket.on('conn', (url) => {
-    socket.to("ROOM1").emit("connected", url);
+  socket.on('start draw', ([x, y, roomId]) => {
+    socket.to(roomId).emit("start drawing", [x, y]);
   });
-
-  socket.on('start draw', ([x, y]) => {
-    socket.to("ROOM1").emit("start drawing", [x, y]);
+  socket.on('finish draw', (roomId) => {
+    socket.to(roomId).emit("finish drawing");
   });
-  socket.on('finish draw', () => {
-    socket.to("ROOM1").emit("finish drawing");
+  socket.on('draw', ([x, y, roomId]) => {
+    socket.to(roomId).emit("drawing", [x, y]);
   });
-  socket.on('draw', ([x, y]) => {
-    socket.to("ROOM1").emit("drawing", [x, y]);
+  socket.on('clean canvas', (roomId) => {
+    socket.to(roomId).emit("cleaning canvas");
   });
 
 });

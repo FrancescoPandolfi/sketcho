@@ -1,12 +1,13 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
 export interface CanvasState {
   penColor: string;
   lineWidth: number;
   redoList: string[];
   undoList: string[];
-  modalState: boolean;
-  socketID: string;
+  joinModalState: boolean;
+  createModalState: boolean;
+  roomId: string;
 }
 
 const initialState: CanvasState = {
@@ -14,8 +15,9 @@ const initialState: CanvasState = {
   lineWidth: 5,
   redoList: [],
   undoList: [],
-  modalState: false,
-  socketID: ''
+  joinModalState: false,
+  createModalState: false,
+  roomId: '123'
 }
 
 export const canvasSlice = createSlice({
@@ -31,16 +33,26 @@ export const canvasSlice = createSlice({
     setUndoList: (state, action: PayloadAction<string[]>) => {
       state.undoList = action.payload
     },
-    setModalState: (state, action: PayloadAction<boolean>) => {
-      state.modalState = action.payload
+    setJoinModalState: (state, action: PayloadAction<boolean>) => {
+      state.joinModalState = action.payload
     },
-    setSocketId: (state, action: PayloadAction<string>) => {
-      state.socketID = action.payload
+    setCreateModalState: (state, action: PayloadAction<boolean>) => {
+      state.createModalState = action.payload
+    },
+    setRoomId: (state, action: PayloadAction<string>) => {
+      state.roomId = action.payload
     }
   }
 });
 
 // Action creators are generated for each case reducer function
-export const { changePenColor, setRedoList, setUndoList, setModalState, setSocketId } = canvasSlice.actions;
+export const {
+  changePenColor,
+  setRedoList,
+  setUndoList,
+  setJoinModalState,
+  setCreateModalState,
+  setRoomId
+} = canvasSlice.actions;
 
 export default canvasSlice.reducer;

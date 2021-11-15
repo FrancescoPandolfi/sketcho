@@ -5,8 +5,8 @@ import React from "react";
 import PillButton from "./PillButton/PillButton";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
-import {setModalState} from "../../redux/canvasSlice";
 import Logo from "../../img/risorsa-1.svg";
+import {setCreateModalState, setJoinModalState} from "../../redux/canvasSlice";
 
 export interface props {
   downloadSketch: () => void;
@@ -29,12 +29,12 @@ const Header = ({downloadSketch, cleanCanvas, undo, redo}: props) => {
       <PillButton
         text="Create room"
         border={false}
-        onClicked={() => dispatch(setModalState(!canvasState.modalState))}
+        onClicked={() => dispatch(setCreateModalState(!canvasState.createModalState))}
       />
       <PillButton
         text="Join room"
         border={true}
-        onClicked={() => dispatch(setModalState(!canvasState.modalState))}
+        onClicked={() => dispatch(setJoinModalState(!canvasState.joinModalState))}
       />
     </div>
   );
