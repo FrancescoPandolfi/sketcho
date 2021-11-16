@@ -8,8 +8,12 @@ const io = require("socket.io")(server, {
   }
 });
 
-io.on('connection', (socket) => {
+server.listen(process.env.PORT || 3001, () => {
+  console.log('listening on *:3001');
+});
 
+
+io.on('connection', (socket) => {
   socket.on('join room', (roomId) => {
     socket.join(roomId);
   });
@@ -25,9 +29,13 @@ io.on('connection', (socket) => {
   socket.on('clean canvas', (roomId) => {
     socket.to(roomId).emit("cleaning canvas");
   });
-
-});
-
-server.listen(3001, () => {
-  console.log('listening on *:3001');
+  socket.on('color changed', ([indexColor, roomId]) => {
+    socket.to(roomId).emit("changing color", [indexColor]);
+  });
+  socket.on('undo', (roomId) => {
+    socket.to(roomId).emit("undoing");
+  });
+  socket.on('redo', (roomId) => {
+    socket.to(roomId).emit("redoing");
+  });
 });

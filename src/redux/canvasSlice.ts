@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
 export interface CanvasState {
-  penColor: string;
+  penColor: number;
   lineWidth: number;
   redoList: string[];
   undoList: string[];
@@ -11,7 +11,7 @@ export interface CanvasState {
 }
 
 const initialState: CanvasState = {
-  penColor: '#001622',
+  penColor: 0,
   lineWidth: 5,
   redoList: [],
   undoList: [],
@@ -24,7 +24,7 @@ export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
   reducers: {
-    changePenColor: (state, action: PayloadAction<string>) => {
+    changePenColor: (state, action: PayloadAction<number>) => {
       state.penColor = action.payload
     },
     setRedoList: (state, action: PayloadAction<string[]>) => {

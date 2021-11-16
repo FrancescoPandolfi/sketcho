@@ -1,41 +1,39 @@
 import css from "./Colorbar.module.scss";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ColorButton from "./ColorButton/ColorButton";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {changePenColor} from "../../redux/canvasSlice";
+import {RootState} from "../../redux/store";
+import socket from "../../config/socket";
+import {colors} from "../../constants/constants"
 
 const Colorbar = () => {
-  const [selectedColor, setSelectedColor] = useState(0);
+  const canvasState = useSelector((state: RootState) => state.canvas);
   const dispatch = useDispatch()
-  const colors = [
-    '#001622',
-    '#FB393E',
-    '#F5672F',
-    '#FA8C2C',
-    '#FAC151',
-    '#83B667',
-    '#339F80',
-    '#B27DF2',
-    '#6D4031',
-    '#FFFFFF'
-  ];
-  
+
+  useEffect(() => {
+    socket.emit('color changed', [canvasState.penColor, canvasState.roomId]);
+  }, [canvasState.penColor, canvasState.roomId]);
+
+  useEffect(() => {
+    socket.on("changing color", ([indexColor]) => {
+      dispatch(changePenColor(indexColor));
+    });
+  }, [dispatch]);
+
   return (
     <div className={css.colorbar}>
       {
         colors.map((color, i) => {
-           return (
-               <ColorButton
-                 key={i}
-                 color={color}
-                 index={i}
-                 selected={selectedColor}
-                 onClick={() => {
-                   setSelectedColor(i);
-                   dispatch(changePenColor(color))
-                 }}
-               />
-           );
+          return (
+            <ColorButton
+              key={i}
+              color={colors[i]}
+              index={i}
+              selected={canvasState.penColor}
+              onClick={() => dispatch(changePenColor(i))}
+            />
+          );
         })
       }
     </div>

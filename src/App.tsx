@@ -7,6 +7,7 @@ import React, {useEffect, useRef, useState} from "react";
 import socket from "./config/socket";
 import {setRedoList, setUndoList} from "./redux/canvasSlice";
 import JoinModal from "./components/Modal/JoinModal";
+import {colors} from "./constants/constants";
 
 
 function App() {
@@ -16,9 +17,11 @@ function App() {
   const canvasState = useSelector((state: RootState) => state.canvas);
   const dispatch = useDispatch();
 
+  /** Socket listeners */
   useEffect(() => {
     socket.on('connect', () => {
-      console.log('connected')});
+      console.log('Connected to server');
+    });
 
     socket.on("start drawing", ([x, y]) => {
       startDrawing(x, y);
@@ -31,6 +34,12 @@ function App() {
     });
     socket.on("cleaning canvas", () => {
       cleanCanvas();
+    });
+    socket.on("undoing", () => {
+      history.undoState(canvasRef.current!, ctx.current!);
+    });
+    socket.on("redoing", () => {
+      history.restoreState(canvasRef.current!, ctx.current!);
     });
   }, []);
 
@@ -49,7 +58,7 @@ function App() {
   useEffect(() => {
     if (!ctx.current) return;
     ctx.current.lineCap = 'round';
-    ctx.current.strokeStyle = canvasState.penColor;
+    ctx.current.strokeStyle = colors[canvasState.penColor];
     ctx.current.lineWidth = canvasState.lineWidth;
   }, [canvasState.penColor, canvasState.lineWidth]);
 
@@ -71,7 +80,7 @@ function App() {
       canvasCtx.putImageData(imageData, 0, 0);
       ctx.current = canvasCtx!;
       ctx.current.lineCap = 'round';
-      ctx.current.strokeStyle = canvasState.penColor;
+      ctx.current.strokeStyle = colors[canvasState.penColor];
       ctx.current.lineWidth = canvasState.lineWidth;
     }
 
@@ -87,9 +96,11 @@ function App() {
     },
     undo: function (canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null) {
       this.undoState(canvas!, ctx!);
+      socket.emit('undo', [canvasState.roomId]);
     },
     redo: function (canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null) {
       this.restoreState(canvas!, ctx!);
+      socket.emit('redo', [canvasState.roomId]);
     },
     undoState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
       const undoUrl = canvasState.undoList.filter((v, i) => i === canvasState.undoList.length - 1)[0];
@@ -135,6 +146,7 @@ function App() {
     draw(offsetX, offsetY);
   }
   const draw = (offsetX: number, offsetY: number) => {
+    if (!isDrawing) return;
     ctx.current!.lineTo(offsetX, offsetY);
     ctx.current!.stroke();
   }
@@ -182,9 +194,10 @@ function App() {
       />
       <canvas
         id="canvas"
-        onMouseDown={onStartDrawing}
-        onMouseUp={onFinishDrawing}
-        onMouseMove={onDraw}
+        style={{ touchAction: 'none' }}
+        onPointerDown={onStartDrawing}
+        onPointerMove={onDraw}
+        onPointerUp={onFinishDrawing}
         ref={canvasRef}
       />
       <Colorbar/>
