@@ -1,5 +1,5 @@
 import css from "./Colorbar.module.scss";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import ColorButton from "./ColorButton/ColorButton";
 import {useDispatch, useSelector} from "react-redux";
 import {changePenColor} from "../../redux/canvasSlice";

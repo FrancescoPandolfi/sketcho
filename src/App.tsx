@@ -128,6 +128,7 @@ function App() {
   /** Start drawing */
   const onStartDrawing = ({nativeEvent}: any) => {
     const {offsetX, offsetY} = nativeEvent;
+    setIsDrawing(true);
     socket.emit('start draw', [offsetX, offsetY, canvasState.roomId]);
     startDrawing(offsetX, offsetY);
   }
@@ -135,10 +136,9 @@ function App() {
     history.saveState(canvasRef.current);
     ctx.current?.beginPath();
     ctx.current?.moveTo(offsetX, offsetY);
-    setIsDrawing(true);
   }
 
-  /** while drawing*/
+  /** while drawing */
   const onDraw = ({nativeEvent}: any) => {
     if (!isDrawing) return;
     const {offsetX, offsetY} = nativeEvent;
@@ -146,7 +146,6 @@ function App() {
     draw(offsetX, offsetY);
   }
   const draw = (offsetX: number, offsetY: number) => {
-    if (!isDrawing) return;
     ctx.current!.lineTo(offsetX, offsetY);
     ctx.current!.stroke();
   }
@@ -162,7 +161,6 @@ function App() {
   }
 
   /** Clean the Canvas */
-
   const onCleanCanvas = () => {
     socket.emit('clean canvas', canvasState.roomId);
     cleanCanvas();
