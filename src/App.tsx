@@ -14,6 +14,7 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
   const canvasState = useSelector((state: RootState) => state.canvas);
   const dispatch = useDispatch();
 
@@ -23,15 +24,10 @@ function App() {
       console.log('Connected to server');
     });
 
-    socket.on("start drawing", ([x, y]) => {
-      startDrawing(x, y);
+    socket.on("drawing", ({fromX, fromY, toX, toY}) => {
+      draw(fromX, fromY, toX, toY);
     });
-    socket.on("drawing", ([x, y]) => {
-      draw(x, y);
-    });
-    socket.on("finish drawing", () => {
-      finishDrawing();
-    });
+
     socket.on("cleaning canvas", () => {
       cleanCanvas();
     });
@@ -129,36 +125,42 @@ function App() {
   const onStartDrawing = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     const {offsetX, offsetY} = nativeEvent;
     setIsDrawing(true);
-    socket.emit('start draw', [offsetX, offsetY, canvasState.roomId]);
-    startDrawing(offsetX, offsetY);
-  }
-  const startDrawing = (offsetX: number, offsetY: number) => {
-    history.saveState(canvasRef.current);
-    ctx.current?.beginPath();
-    ctx.current?.moveTo(offsetX, offsetY);
+    setMousePosition({x: offsetX, y: offsetY});
   }
 
+
   /** while drawing */
-  const onDraw = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+  const onMove = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     if (!isDrawing) return;
     const {offsetX, offsetY} = nativeEvent;
-    socket.emit('draw', [offsetX, offsetY, canvasState.roomId]);
-    draw(offsetX, offsetY);
+
+    const prevPosition = mousePosition;
+    setMousePosition({x: offsetX, y: offsetY});
+
+    history.saveState(canvasRef.current);
+
+    socket.emit('draw', {
+      fromX: prevPosition.x,
+      fromY: prevPosition.y,
+      toX: offsetX,
+      toY: offsetY,
+      roomId: canvasState.roomId,
+    });
+    draw(prevPosition.x, prevPosition.y, offsetX, offsetY);
   }
-  const draw = (offsetX: number, offsetY: number) => {
-    ctx.current!.lineTo(offsetX, offsetY);
+
+  const draw = (fromX: number, fromY: number, toX: number, toY: number) => {
+    ctx.current!.beginPath();
+    ctx.current!.moveTo(fromX, fromY);
+    ctx.current!.lineTo(toX, toY);
     ctx.current!.stroke();
   }
 
   /** Finish drawing */
   const onFinishDrawing = () => {
-    socket.emit('finish draw', canvasState.roomId);
-    finishDrawing();
-  }
-  const finishDrawing = () => {
-    ctx.current?.closePath();
     setIsDrawing(false);
   }
+
 
   /** Clean the Canvas */
   const onCleanCanvas = () => {
@@ -194,7 +196,7 @@ function App() {
         id="canvas"
         style={{ touchAction: 'none' }}
         onPointerDown={onStartDrawing}
-        onPointerMove={onDraw}
+        onPointerMove={onMove}
         onPointerUp={onFinishDrawing}
         ref={canvasRef}
       />
