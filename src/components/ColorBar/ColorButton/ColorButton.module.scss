@@ -5,16 +5,28 @@
   cursor: pointer;
   border-radius: 50%;
   margin: 3px;
+  opacity: 0.8;
+}
+
+.btnColor.selected {
+  opacity: 1;
+}
+
+.btnColor:hover {
+  opacity: 1;
 }
 
 .buttonWrapper {
-  border: 3px solid #7A36F9;
+  border: 3px solid white;
   border-radius: 50%;
 }
 
-.buttonWrapperWhite {
-  border: 3px solid white;
-  border-radius: 50%;
+.buttonWrapper.selected {
+  border: 3px solid #7A36F9;
+}
+
+.buttonWrapper:last-child .btnColor {
+  border: 1px solid #c0c0c0;
 }
 
 

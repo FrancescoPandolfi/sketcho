@@ -5,15 +5,15 @@ export interface props {
   onClick: () => void;
   color: string;
   index: number;
-  selected: number;
+  selectedBtn: number;
 }
 
-const ColorButton: FC<props> = ({onClick, color, index, selected}) => {
+const ColorButton: FC<props> = ({onClick, color, index, selectedBtn}) => {
   return (
-    <div className={selected === index ? css.buttonWrapper : css.buttonWrapperWhite}>
+  <div className={selectedBtn === index ? `${css.buttonWrapper} ${css.selected}` : css.buttonWrapper}>
       <button
         style={{background: `${color}`}}
-        className={css.btnColor}
+        className={selectedBtn === index ? `${css.btnColor} ${css.selected}` : css.btnColor}
         onClick={onClick}
       />
     </div>

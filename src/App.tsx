@@ -43,7 +43,7 @@ function App() {
     });
   }, []);
 
-  /** First setup  */
+  /** Canvas First setup  */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -126,7 +126,7 @@ function App() {
   }
 
   /** Start drawing */
-  const onStartDrawing = ({nativeEvent}: any) => {
+  const onStartDrawing = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     const {offsetX, offsetY} = nativeEvent;
     setIsDrawing(true);
     socket.emit('start draw', [offsetX, offsetY, canvasState.roomId]);
@@ -139,7 +139,7 @@ function App() {
   }
 
   /** while drawing */
-  const onDraw = ({nativeEvent}: any) => {
+  const onDraw = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     if (!isDrawing) return;
     const {offsetX, offsetY} = nativeEvent;
     socket.emit('draw', [offsetX, offsetY, canvasState.roomId]);

@@ -30,7 +30,7 @@ const Colorbar = () => {
               key={i}
               color={colors[i]}
               index={i}
-              selected={canvasState.penColor}
+              selectedBtn={canvasState.penColor}
               onClick={() => dispatch(changePenColor(i))}
             />
           );
