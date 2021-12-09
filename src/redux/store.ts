@@ -1,11 +1,12 @@
-import {configureStore} from "@reduxjs/toolkit";
-import canvasReducer from "./canvasSlice";
+import {configureStore} from "@reduxjs/toolkit"
+import canvasReducer from "./canvasSlice"
 
 export const store = configureStore({
   reducer: {
     canvas: canvasReducer
-  }
-});
+  },
+  devTools: false
+})
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>

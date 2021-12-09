@@ -17,16 +17,11 @@ io.on('connection', (socket) => {
   socket.on('join room', (roomId) => {
     socket.join(roomId);
   });
-
-  socket.on('draw', (data) => {
-    socket.to(data.roomId).emit("drawing", data);
+  socket.on('draw', (canvasData) => {
+    socket.to(canvasData.roomId).emit("drawing", canvasData);
   });
-
   socket.on('clean canvas', (roomId) => {
     socket.to(roomId).emit("cleaning canvas");
-  });
-  socket.on('color changed', ([indexColor, roomId]) => {
-    socket.to(roomId).emit("changing color", [indexColor]);
   });
   socket.on('undo', (roomId) => {
     socket.to(roomId).emit("undoing");

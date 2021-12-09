@@ -8,7 +8,7 @@ import {RootState} from "../../redux/store";
 import Logo from "../../img/risorsa-1.svg";
 import {setCreateModalState, setJoinModalState} from "../../redux/canvasSlice";
 
-export interface props {
+type props = {
   downloadSketch: () => void;
   cleanCanvas: () => void;
   undo: () => void;
@@ -20,8 +20,8 @@ const Header = ({downloadSketch, cleanCanvas, undo, redo}: props) => {
   const canvasState = useSelector((state: RootState) => state.canvas);
 
   return (
-    <div className={css.toolbar}>
-      <div className={css.logo}><img src={Logo} alt="Draw with me"/></div>
+    <div className={css.header}>
+      <div className={css.logo}><img src={Logo} alt="Drawo"/></div>
       <RoundButton disabled={canvasState.undoList.length === 0}  action={undo} icon={<CgUndo/>}/>
       <RoundButton disabled={canvasState.redoList.length === 0} action={redo} icon={<CgRedo/>}/>
       <RoundButton action={cleanCanvas} icon={<CgErase/>}/>

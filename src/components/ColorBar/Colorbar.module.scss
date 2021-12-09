@@ -1,3 +1,5 @@
+@import "../../styles/variables";
+
 .colorbar {
   display: flex;
   position: fixed;
@@ -6,4 +8,5 @@
   padding: 15px;
   width: 100%;
   justify-content: center;
+  background-color: $background;
 }

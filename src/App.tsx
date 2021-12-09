@@ -23,11 +23,9 @@ function App() {
     socket.on('connect', () => {
       console.log('Connected to server');
     });
-
-    socket.on("drawing", ({fromX, fromY, toX, toY}) => {
-      draw(fromX, fromY, toX, toY);
+    socket.on("drawing", ({fromX, fromY, toX, toY, penColor, lineWidth}) => {
+      draw(fromX, fromY, toX, toY, penColor, lineWidth);
     });
-
     socket.on("cleaning canvas", () => {
       cleanCanvas();
     });
@@ -39,7 +37,9 @@ function App() {
     });
   }, []);
 
-  /** Canvas First setup  */
+  /**
+   * Canvas First setup
+   * */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -50,7 +50,9 @@ function App() {
     ctx.current = canvas.getContext('2d');
   }, []);
 
-  /** Setup line configuration*/
+  /**
+   * Setup line configuration
+   * */
   useEffect(() => {
     if (!ctx.current) return;
     ctx.current.lineCap = 'round';
@@ -58,7 +60,9 @@ function App() {
     ctx.current.lineWidth = canvasState.lineWidth;
   }, [canvasState.penColor, canvasState.lineWidth]);
 
-  /** Setup event listener to handle window resize*/
+  /**
+   * Setup event listener to handle window resize
+   * */
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
@@ -84,7 +88,9 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   });
 
-  /** Manage draw history */
+  /**
+   * Manage draw history
+   * */
   const history = {
     saveState: function (c: HTMLCanvasElement | null) {
       dispatch(setUndoList([...canvasState.undoList, c!.toDataURL()]));
@@ -121,7 +127,9 @@ function App() {
     }
   }
 
-  /** Start drawing */
+  /**
+   * On pointer down
+   * */
   const onStartDrawing = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     const {offsetX, offsetY} = nativeEvent;
     setIsDrawing(true);
@@ -129,14 +137,15 @@ function App() {
   }
 
 
-  /** while drawing */
+  /**
+   * On pointer move
+   * */
   const onMove = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    console.log('onmove');
     if (!isDrawing) return;
     const {offsetX, offsetY} = nativeEvent;
-
     const prevPosition = mousePosition;
     setMousePosition({x: offsetX, y: offsetY});
-
     history.saveState(canvasRef.current);
 
     socket.emit('draw', {
@@ -144,25 +153,40 @@ function App() {
       fromY: prevPosition.y,
       toX: offsetX,
       toY: offsetY,
+      penColor: canvasState.penColor,
+      lineWidth: canvasState.lineWidth,
       roomId: canvasState.roomId,
     });
-    draw(prevPosition.x, prevPosition.y, offsetX, offsetY);
+    draw(
+      prevPosition.x,
+      prevPosition.y,
+      offsetX,
+      offsetY,
+      canvasState.penColor,
+      canvasState.lineWidth
+    );
   }
 
-  const draw = (fromX: number, fromY: number, toX: number, toY: number) => {
+  /**
+   * Draw a line over the canvas element
+   */
+  const draw = (fromX: number, fromY: number, toX: number, toY: number, penColor: number, lineWidth: number) => {
+    console.log('draw')
     ctx.current!.beginPath();
+    ctx.current!.lineWidth = lineWidth;
+    ctx.current!.strokeStyle = colors[penColor];
     ctx.current!.moveTo(fromX, fromY);
     ctx.current!.lineTo(toX, toY);
     ctx.current!.stroke();
   }
 
-  /** Finish drawing */
   const onFinishDrawing = () => {
     setIsDrawing(false);
   }
 
-
-  /** Clean the Canvas */
+  /**
+   * Clean the Canvas the canvas element and emit the clean event to the server
+   */
   const onCleanCanvas = () => {
     socket.emit('clean canvas', canvasState.roomId);
     cleanCanvas();
@@ -175,7 +199,9 @@ function App() {
     dispatch(setRedoList([]));
   }
 
-  /** Download the draw */
+  /**
+   * Download the draw
+   * */
   const downloadSketch = () => {
     const link = document.createElement('a');
     link.download = 'sketch.png';

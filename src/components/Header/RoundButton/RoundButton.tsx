@@ -9,12 +9,11 @@ export interface props {
 
 const RoundButton: FC<props> = ({action, icon, disabled = false}: props) => {
   return (
-      <button
-        disabled={disabled}
-        className={`${css.btn}
-        ${css.btnColor}`}
-        onClick={action}>{icon}
-      </button>
+    <button
+      disabled={disabled}
+      className={`${css.btn} ${css.btnColor}`}
+      onClick={action}>{icon}
+    </button>
   );
 };
 
