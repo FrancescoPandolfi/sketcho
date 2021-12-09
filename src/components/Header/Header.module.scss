@@ -1,3 +1,5 @@
+@import "../../styles/variables";
+
 .header {
   position: fixed;
   top: 0;
@@ -7,9 +9,15 @@
   display: flex;
   border-bottom: 1px solid #eaeaea;
   box-shadow: #d7d7d7 0 0px 8px 0;
+  background-color: $background;
 }
 .logo {
-  width: 60px;
+  font-size: 40px;
+  background: linear-gradient(to bottom, #7936E9 0%, #7A36F9 51%, #6524e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  width: 200px;
   margin-right: auto;
 }
 

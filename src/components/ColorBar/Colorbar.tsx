@@ -4,7 +4,7 @@ import ColorButton from "./ColorButton/ColorButton";
 import {useDispatch, useSelector} from "react-redux";
 import {changePenColor} from "../../redux/canvasSlice";
 import {RootState} from "../../redux/store";
-import {colors} from "../../constants/constants"
+import {colors} from "../../utils/constants"
 
 const Colorbar = () => {
   const canvasState = useSelector((state: RootState) => state.canvas);

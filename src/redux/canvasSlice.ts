@@ -5,9 +5,8 @@ export interface CanvasState {
   lineWidth: number;
   redoList: string[];
   undoList: string[];
-  joinModalState: boolean;
   createModalState: boolean;
-  roomId: string;
+  roomId: string | null;
 }
 
 const initialState: CanvasState = {
@@ -15,9 +14,8 @@ const initialState: CanvasState = {
   lineWidth: 5,
   redoList: [],
   undoList: [],
-  joinModalState: false,
   createModalState: false,
-  roomId: '123'
+  roomId: null
 }
 
 export const canvasSlice = createSlice({
@@ -33,9 +31,6 @@ export const canvasSlice = createSlice({
     setUndoList: (state, action: PayloadAction<string[]>) => {
       state.undoList = action.payload
     },
-    setJoinModalState: (state, action: PayloadAction<boolean>) => {
-      state.joinModalState = action.payload
-    },
     setCreateModalState: (state, action: PayloadAction<boolean>) => {
       state.createModalState = action.payload
     },
@@ -50,7 +45,6 @@ export const {
   changePenColor,
   setRedoList,
   setUndoList,
-  setJoinModalState,
   setCreateModalState,
   setRoomId
 } = canvasSlice.actions;

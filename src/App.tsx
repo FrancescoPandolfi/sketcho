@@ -3,11 +3,12 @@ import Colorbar from "./components/ColorBar/Colorbar";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./redux/store";
 import CreateModal from "./components/Modal/CreateModal";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import socket from "./config/socket";
-import {setRedoList, setUndoList} from "./redux/canvasSlice";
-import JoinModal from "./components/Modal/JoinModal";
-import {colors} from "./constants/constants";
+import {setRedoList, setRoomId, setUndoList} from "./redux/canvasSlice";
+import {colors} from "./utils/constants";
+import {useLocation, useNavigate} from "react-router-dom";
+import {uid} from "./utils/uid";
 
 
 function App() {
@@ -17,24 +18,27 @@ function App() {
   const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
   const canvasState = useSelector((state: RootState) => state.canvas);
   const dispatch = useDispatch();
+  let navigate = useNavigate();
+  let location = useLocation();
 
-  /** Socket listeners */
+
+  /**
+   * Join the room if it's set in the url
+   * */
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-    socket.on("drawing", ({fromX, fromY, toX, toY, penColor, lineWidth}) => {
-      draw(fromX, fromY, toX, toY, penColor, lineWidth);
-    });
-    socket.on("cleaning canvas", () => {
-      cleanCanvas();
-    });
-    socket.on("undoing", () => {
-      history.undoState(canvasRef.current!, ctx.current!);
-    });
-    socket.on("redoing", () => {
-      history.restoreState(canvasRef.current!, ctx.current!);
-    });
+    console.log('pathnaem', location.pathname)
+
+    const roomIdInUrl = location.pathname.substring(1);
+    console.log('id url', roomIdInUrl)
+
+    if (roomIdInUrl) {
+      navigate(roomIdInUrl);
+      dispatch(setRoomId(roomIdInUrl));
+      socket.emit("join room", roomIdInUrl);
+    } else {
+      const roomId = uid();
+      dispatch(setRoomId(roomId));
+    }
   }, []);
 
   /**
@@ -48,6 +52,7 @@ function App() {
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
     ctx.current = canvas.getContext('2d');
+    ctx.current!.imageSmoothingEnabled = true;
   }, []);
 
   /**
@@ -83,7 +88,6 @@ function App() {
       ctx.current.strokeStyle = colors[canvasState.penColor];
       ctx.current.lineWidth = canvasState.lineWidth;
     }
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   });
@@ -91,7 +95,7 @@ function App() {
   /**
    * Manage draw history
    * */
-  const history = {
+  const history = useMemo(() => ({
     saveState: function (c: HTMLCanvasElement | null) {
       dispatch(setUndoList([...canvasState.undoList, c!.toDataURL()]));
       dispatch(setRedoList([]));
@@ -125,7 +129,7 @@ function App() {
         ctx.drawImage(img, 0, 0, W, H, 0, 0, W, H);
       }
     }
-  }
+  }), [canvasState.redoList, canvasState.roomId, canvasState.undoList, dispatch]);
 
   /**
    * On pointer down
@@ -141,7 +145,6 @@ function App() {
    * On pointer move
    * */
   const onMove = ({nativeEvent}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-    console.log('onmove');
     if (!isDrawing) return;
     const {offsetX, offsetY} = nativeEvent;
     const prevPosition = mousePosition;
@@ -170,15 +173,17 @@ function App() {
   /**
    * Draw a line over the canvas element
    */
-  const draw = (fromX: number, fromY: number, toX: number, toY: number, penColor: number, lineWidth: number) => {
-    console.log('draw')
+
+  const draw = useCallback((fromX: number, fromY: number, toX: number, toY: number, penColor: number, lineWidth: number) => {
     ctx.current!.beginPath();
     ctx.current!.lineWidth = lineWidth;
     ctx.current!.strokeStyle = colors[penColor];
+    ctx.current!.lineJoin = "round";
     ctx.current!.moveTo(fromX, fromY);
     ctx.current!.lineTo(toX, toY);
     ctx.current!.stroke();
-  }
+  }, []);
+
 
   const onFinishDrawing = () => {
     setIsDrawing(false);
@@ -192,43 +197,63 @@ function App() {
     cleanCanvas();
   }
 
-  const cleanCanvas = () => {
+  const cleanCanvas = useCallback(() => {
     ctx.current!.fillStyle = '#FFFFFF';
     ctx.current!.clearRect(0, 0, window.innerWidth, window.innerHeight);
     dispatch(setUndoList([]));
     dispatch(setRedoList([]));
-  }
+  }, [dispatch]);
 
   /**
    * Download the draw
    * */
-  const downloadSketch = () => {
-    const link = document.createElement('a');
-    link.download = 'sketch.png';
-    link.href = ctx.current!.canvas.toDataURL();
-    link.click();
-  }
-  return (
-    <>
-      {canvasState.createModalState && <CreateModal/>}
-      {canvasState.joinModalState && <JoinModal/>}
-      <Header
-        downloadSketch={downloadSketch}
-        cleanCanvas={onCleanCanvas}
-        undo={() => history.undo(canvasRef.current, ctx.current)}
-        redo={() => history.redo(canvasRef.current, ctx.current)}
-      />
-      <canvas
-        id="canvas"
-        style={{ touchAction: 'none' }}
-        onPointerDown={onStartDrawing}
-        onPointerMove={onMove}
-        onPointerUp={onFinishDrawing}
-        ref={canvasRef}
-      />
-      <Colorbar/>
-    </>
-  );
+  const downloadSketch = useCallback(() => {
+      const link = document.createElement('a');
+      link.download = 'sketch.png';
+      link.href = ctx.current!.canvas.toDataURL();
+      link.click();
+    }, []);
+
+
+/** Socket listeners */
+useEffect(() => {
+  socket.on('connect', () => {
+    console.log('Connected to server');
+  });
+  socket.on("drawing", ({fromX, fromY, toX, toY, penColor, lineWidth}) => {
+    draw(fromX, fromY, toX, toY, penColor, lineWidth);
+  });
+  socket.on("cleaning canvas", () => {
+    cleanCanvas();
+  });
+  socket.on("undoing", () => {
+    history.undoState(canvasRef.current!, ctx.current!);
+  });
+  socket.on("redoing", () => {
+    history.restoreState(canvasRef.current!, ctx.current!);
+  });
+}, [draw, cleanCanvas, history]);
+
+return (
+  <>
+    {canvasState.createModalState && <CreateModal/>}
+    <Header
+      downloadSketch={downloadSketch}
+      cleanCanvas={onCleanCanvas}
+      undo={() => history.undo(canvasRef.current, ctx.current)}
+      redo={() => history.redo(canvasRef.current, ctx.current)}
+    />
+    <canvas
+      id="canvas"
+      style={{touchAction: 'none'}}
+      onPointerDown={onStartDrawing}
+      onPointerMove={onMove}
+      onPointerUp={onFinishDrawing}
+      ref={canvasRef}
+    />
+    <Colorbar/>
+  </>
+);
 }
 
 export default App;
