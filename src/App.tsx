@@ -254,7 +254,7 @@ return (
     />
     <Colorbar/>
     {/*<PenSizeRange />*/}
-    <Cursor />
+    {/*<Cursor />*/}
   </>
 );
 }
