@@ -19,7 +19,7 @@ const CreateModal: FC = () => {
       <div className={css.modalContainer}>
         <p>{window.location.href}</p>
         <p>Send this link to your buddy and start to draw together</p>
-        <PillButton border={false} text="🤙" onClicked={handleCreateRoom}/>
+        <PillButton background={true} text="🤙" onClicked={handleCreateRoom}/>
       </div>
     </div>
   );

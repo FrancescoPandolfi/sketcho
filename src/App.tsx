@@ -9,6 +9,8 @@ import {setRedoList, setRoomId, setUndoList} from "./redux/canvasSlice";
 import {colors} from "./utils/constants";
 import {useLocation, useNavigate} from "react-router-dom";
 import {uid} from "./utils/uid";
+import PenSizeRange from "./components/PenSizeRange/PenSizeRange";
+import Cursor from "./components/Cursor/Cursor";
 
 
 function App() {
@@ -26,15 +28,13 @@ function App() {
    * Join the room if it's set in the url
    * */
   useEffect(() => {
-    console.log('pathnaem', location.pathname)
-
     const roomIdInUrl = location.pathname.substring(1);
-    console.log('id url', roomIdInUrl)
 
     if (roomIdInUrl) {
       navigate(roomIdInUrl);
       dispatch(setRoomId(roomIdInUrl));
       socket.emit("join room", roomIdInUrl);
+
     } else {
       const roomId = uid();
       dispatch(setRoomId(roomId));
@@ -47,12 +47,14 @@ function App() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const scale = 2;
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
     ctx.current = canvas.getContext('2d');
     ctx.current!.imageSmoothingEnabled = true;
+    ctx.current!.scale(scale, scale);
   }, []);
 
   /**
@@ -173,7 +175,6 @@ function App() {
   /**
    * Draw a line over the canvas element
    */
-
   const draw = useCallback((fromX: number, fromY: number, toX: number, toY: number, penColor: number, lineWidth: number) => {
     ctx.current!.beginPath();
     ctx.current!.lineWidth = lineWidth;
@@ -252,6 +253,8 @@ return (
       ref={canvasRef}
     />
     <Colorbar/>
+    {/*<PenSizeRange />*/}
+    <Cursor />
   </>
 );
 }

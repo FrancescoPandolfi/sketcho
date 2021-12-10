@@ -4,15 +4,15 @@ import css from "./PillButton.module.scss";
 export interface props {
   onClicked: () => void;
   text: string;
-  border: boolean;
+  background: boolean;
 }
 
-const PillButton: FC<props> = ({onClicked, text, border}: props) => {
+const PillButton: FC<props> = ({onClicked, text, background}: props) => {
 
-  const borderStyle = border ? css.border : css.noBorder;
+  const bgStyle = background ? css.withBackground : css.noBackground;
 
   return (
-    <button className={`${css.btn} ${borderStyle}`}
+    <button className={`${css.btn} ${bgStyle}`}
       onClick={onClicked}>
       {text}
     </button>

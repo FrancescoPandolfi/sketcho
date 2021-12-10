@@ -1,6 +1,6 @@
 import css from "./Header.module.scss";
-import RoundButton from "./RoundButton/RoundButton";
-import {CgErase, CgRedo, CgSoftwareDownload, CgUndo} from "react-icons/all";
+import ToolButton from "./ToolButton/ToolButton";
+import {CgErase, CgSoftwareDownload} from "react-icons/all";
 import React from "react";
 import PillButton from "./PillButton/PillButton";
 import {useDispatch, useSelector} from "react-redux";
@@ -23,7 +23,6 @@ const Header = ({downloadSketch, cleanCanvas, undo, redo}: props) => {
 
   const handleInviteBuddy = () => {
     dispatch(setCreateModalState(!canvasState.createModalState));
-    console.log(canvasState)
     if (canvasState.roomId) {
       navigate(canvasState.roomId);
       socket.emit("join room", canvasState.roomId);
@@ -34,13 +33,15 @@ const Header = ({downloadSketch, cleanCanvas, undo, redo}: props) => {
   return (
     <div className={css.header}>
       <div className={css.logo}>Sketcho</div>
-      <RoundButton disabled={canvasState.undoList.length === 0} action={undo} icon={<CgUndo/>}/>
-      <RoundButton disabled={canvasState.redoList.length === 0} action={redo} icon={<CgRedo/>}/>
-      <RoundButton action={cleanCanvas} icon={<CgErase/>}/>
-      <RoundButton action={downloadSketch} icon={<CgSoftwareDownload/>}/>
+      {/*<ToolButton disabled={canvasState.undoList.length === 0} action={undo} icon={<CgUndo/>}/>*/}
+      {/*<ToolButton disabled={canvasState.redoList.length === 0} action={redo} icon={<CgRedo/>}/>*/}
+      <div>
+        <ToolButton action={cleanCanvas} icon={<CgErase/>}/>
+        <ToolButton action={downloadSketch} icon={<CgSoftwareDownload/>}/>
+      </div>
       <PillButton
-        text="Invite buddy"
-        border={false}
+        text="‍👨🏻‍ Invite buddy 👩🏾‍"
+        background={false}
         onClicked={handleInviteBuddy}
       />
     </div>

@@ -5,20 +5,18 @@
   top: 0;
   left: 0;
   width: 100%;
-  padding: 15px;
+  padding: 15px 30px;
   display: flex;
   border-bottom: 1px solid #eaeaea;
-  box-shadow: #d7d7d7 0 0px 8px 0;
+  align-items: center;
+  justify-content: space-between;
+  //box-shadow: #d7d7d7 0 0px 8px 0;
   background-color: $background;
 }
 .logo {
-  font-size: 40px;
-  background: linear-gradient(to bottom, #7936E9 0%, #7A36F9 51%, #6524e0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 25px;
+  color: white;
   font-weight: bold;
-  width: 200px;
-  margin-right: auto;
 }
 
 

@@ -1,5 +1,5 @@
 import React, {FC, ReactElement} from "react";
-import css from "./Roundbutton.module.scss"
+import css from "./Toolbutton.module.scss"
 
 export interface props {
   action: () => void;
@@ -7,7 +7,7 @@ export interface props {
   disabled?: boolean;
 }
 
-const RoundButton: FC<props> = ({action, icon, disabled = false}: props) => {
+const ToolButton: FC<props> = ({action, icon, disabled = false}: props) => {
   return (
     <button
       disabled={disabled}
@@ -17,4 +17,4 @@ const RoundButton: FC<props> = ({action, icon, disabled = false}: props) => {
   );
 };
 
-export default RoundButton;
+export default ToolButton;
