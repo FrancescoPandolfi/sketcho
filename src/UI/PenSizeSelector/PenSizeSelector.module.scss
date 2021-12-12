@@ -1,0 +1,19 @@
+#rangeSlider {
+  position: fixed;
+  transform: rotate(-90deg);
+  top: 200px;
+  -webkit-appearance: none;
+}
+
+#rangeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: black;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.penSize {
+
+}

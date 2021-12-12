@@ -1,6 +1,8 @@
+@import "../../../styles/variables";
+
 .btnColor {
-  height: 40px;
-  width: 40px;
+  height: 20px;
+  width: 20px;
   border: 0;
   cursor: pointer;
   border-radius: 50%;
@@ -22,11 +24,19 @@
 }
 
 .buttonWrapper.selected {
-  border: 3px solid #7A36F9;
+  border: 3px solid $violet-main;
 }
 
-.buttonWrapper:first-child .btnColor {
-  border: 1px solid #2a2a2a;
+.buttonWrapper.selected:last-child {
+  display: none;
+}
+
+.buttonWrapper:last-child {
+  display: none;
+}
+
+.buttonWrapper:last-child .btnColor {
+  display: none;
 }
 
 
