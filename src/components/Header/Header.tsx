@@ -1,8 +1,8 @@
 import css from "./Header.module.scss";
-import ToolButton from "./ToolButton/ToolButton";
-import {CgErase, CgSoftwareDownload} from "react-icons/all";
-import React from "react";
-import PillButton from "./PillButton/PillButton";
+import ToolButton from "../../UI/ToolButton/ToolButton";
+import {BsPencil, CgErase, CgSoftwareDownload, CgTrash} from "react-icons/all";
+import React, {useCallback} from "react";
+import PillButton from "../../UI/PillButton/PillButton";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {setCreateModalState} from "../../redux/canvasSlice";
@@ -11,32 +11,32 @@ import {useNavigate} from "react-router-dom";
 
 type props = {
   downloadSketch: () => void;
+  setPencil: () => void;
+  setErase: () => void;
   cleanCanvas: () => void;
-  undo: () => void;
-  redo: () => void;
 }
 
-const Header = ({downloadSketch, cleanCanvas, undo, redo}: props) => {
+const Header = ({downloadSketch, setPencil, setErase, cleanCanvas}: props) => {
   const dispatch = useDispatch();
   const canvasState = useSelector((state: RootState) => state.canvas);
   const navigate = useNavigate();
 
-  const handleInviteBuddy = () => {
+  const handleInviteBuddy = useCallback(() => {
     dispatch(setCreateModalState(!canvasState.createModalState));
     if (canvasState.roomId) {
       navigate(canvasState.roomId);
       socket.emit("join room", canvasState.roomId);
     }
-  };
+  }, [canvasState.createModalState, canvasState.roomId, dispatch, navigate]);
 
 
   return (
     <div className={css.header}>
       <div className={css.logo}>Sketcho</div>
-      {/*<ToolButton disabled={canvasState.undoList.length === 0} action={undo} icon={<CgUndo/>}/>*/}
-      {/*<ToolButton disabled={canvasState.redoList.length === 0} action={redo} icon={<CgRedo/>}/>*/}
       <div>
-        <ToolButton action={cleanCanvas} icon={<CgErase/>}/>
+        <ToolButton action={setPencil} icon={<BsPencil/>}/>
+        <ToolButton action={setErase} icon={<CgErase/>}/>
+        <ToolButton action={cleanCanvas} icon={<CgTrash/>}/>
         <ToolButton action={downloadSketch} icon={<CgSoftwareDownload/>}/>
       </div>
       <PillButton

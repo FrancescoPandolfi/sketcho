@@ -1,19 +1,12 @@
-#rangeSlider {
+.sizeSelector {
   position: fixed;
-  transform: rotate(-90deg);
-  top: 200px;
-  -webkit-appearance: none;
-}
-
-#rangeSlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  background: black;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.penSize {
-
+  top: 0;
+  left: 20px;
+  height: 100%;
+  padding: 0 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
 }

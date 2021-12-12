@@ -10,3 +10,5 @@ export const colors = [
   '#6D4031',
   '#FFFFFF'
 ];
+
+export const penSize = [5, 15, 30];

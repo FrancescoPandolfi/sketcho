@@ -3,7 +3,7 @@ import css from "./Modal.module.scss";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {setCreateModalState} from "../../redux/canvasSlice";
-import PillButton from "../Header/PillButton/PillButton";
+import PillButton from "../../UI/PillButton/PillButton";
 
 const CreateModal: FC = () => {
   const canvasState = useSelector((state: RootState) => state.canvas);

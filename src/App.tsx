@@ -3,14 +3,14 @@ import Colorbar from "./components/ColorBar/Colorbar";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./redux/store";
 import CreateModal from "./components/Modal/CreateModal";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import socket from "./config/socket";
-import {setRedoList, setRoomId, setUndoList} from "./redux/canvasSlice";
-import {colors} from "./utils/constants";
+import {changePenColor, setRedoList, setRoomId, setUndoList} from "./redux/canvasSlice";
+import {colors, penSize} from "./utils/constants";
 import {useLocation, useNavigate} from "react-router-dom";
 import {uid} from "./utils/uid";
-import PenSizeRange from "./components/PenSizeRange/PenSizeRange";
-import Cursor from "./components/Cursor/Cursor";
+import PenSizeSelector from "./UI/PenSizeSelector/PenSizeSelector";
+import css from "./App.module.scss";
 
 
 function App() {
@@ -22,7 +22,6 @@ function App() {
   const dispatch = useDispatch();
   let navigate = useNavigate();
   let location = useLocation();
-
 
   /**
    * Join the room if it's set in the url
@@ -39,7 +38,7 @@ function App() {
       const roomId = uid();
       dispatch(setRoomId(roomId));
     }
-  }, []);
+  }, [dispatch, navigate, location]);
 
   /**
    * Canvas First setup
@@ -47,24 +46,22 @@ function App() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const scale = 2;
-    canvas.width = window.innerWidth * 2;
-    canvas.height = window.innerHeight * 2;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
     ctx.current = canvas.getContext('2d');
     ctx.current!.imageSmoothingEnabled = true;
-    ctx.current!.scale(scale, scale);
   }, []);
 
   /**
-   * Setup line configuration
+   * Line configuration
    * */
   useEffect(() => {
     if (!ctx.current) return;
     ctx.current.lineCap = 'round';
     ctx.current.strokeStyle = colors[canvasState.penColor];
-    ctx.current.lineWidth = canvasState.lineWidth;
+    ctx.current.lineWidth = penSize[canvasState.lineWidth];
   }, [canvasState.penColor, canvasState.lineWidth]);
 
   /**
@@ -88,7 +85,7 @@ function App() {
       ctx.current = canvasCtx!;
       ctx.current.lineCap = 'round';
       ctx.current.strokeStyle = colors[canvasState.penColor];
-      ctx.current.lineWidth = canvasState.lineWidth;
+      ctx.current.lineWidth = penSize[canvasState.lineWidth];
     }
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -97,41 +94,41 @@ function App() {
   /**
    * Manage draw history
    * */
-  const history = useMemo(() => ({
-    saveState: function (c: HTMLCanvasElement | null) {
-      dispatch(setUndoList([...canvasState.undoList, c!.toDataURL()]));
-      dispatch(setRedoList([]));
-    },
-    undo: function (canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null) {
-      this.undoState(canvas!, ctx!);
-      socket.emit('undo', [canvasState.roomId]);
-    },
-    redo: function (canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null) {
-      this.restoreState(canvas!, ctx!);
-      socket.emit('redo', [canvasState.roomId]);
-    },
-    undoState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-      const undoUrl = canvasState.undoList.filter((v, i) => i === canvasState.undoList.length - 1)[0];
-      dispatch(setUndoList(canvasState.undoList.filter((v, i) => i !== canvasState.undoList.length - 1)));
-      dispatch(setRedoList([...canvasState.redoList, c.toDataURL()]));
-      this.renderImage(undoUrl, ctx);
-    },
-    restoreState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-      const redoUrl = canvasState.redoList.filter((value, i) => i === canvasState.redoList.length - 1)[0];
-      dispatch(setUndoList([...canvasState.undoList, c.toDataURL()]));
-      dispatch(setRedoList(canvasState.redoList.filter((v, i) => i !== canvasState.redoList.length - 1)));
-      this.renderImage(redoUrl, ctx);
-    },
-    renderImage: (undoUrl: string, ctx: CanvasRenderingContext2D) => {
-      const img: HTMLImageElement = document.createElement('img');
-      const [W, H] = [window.innerWidth, window.innerHeight];
-      img.src = undoUrl;
-      img.onload = () => {
-        ctx.clearRect(0, 0, W, H);
-        ctx.drawImage(img, 0, 0, W, H, 0, 0, W, H);
-      }
-    }
-  }), [canvasState.redoList, canvasState.roomId, canvasState.undoList, dispatch]);
+  // const history = useMemo(() => ({
+  //   saveState: function (c: HTMLCanvasElement | null) {
+  //     dispatch(setUndoList([...canvasState.undoList, c!.toDataURL()]));
+  //     dispatch(setRedoList([]));
+  //   },
+  //   undo: function (canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null) {
+  //     this.undoState(canvas!, ctx!);
+  //     socket.emit('undo', [canvasState.roomId]);
+  //   },
+  //   redo: function (canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null) {
+  //     this.restoreState(canvas!, ctx!);
+  //     socket.emit('redo', [canvasState.roomId]);
+  //   },
+  //   undoState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  //     const undoUrl = canvasState.undoList.filter((v, i) => i === canvasState.undoList.length - 1)[0];
+  //     dispatch(setUndoList(canvasState.undoList.filter((v, i) => i !== canvasState.undoList.length - 1)));
+  //     dispatch(setRedoList([...canvasState.redoList, c.toDataURL()]));
+  //     this.renderImage(undoUrl, ctx);
+  //   },
+  //   restoreState: function (c: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  //     const redoUrl = canvasState.redoList.filter((value, i) => i === canvasState.redoList.length - 1)[0];
+  //     dispatch(setUndoList([...canvasState.undoList, c.toDataURL()]));
+  //     dispatch(setRedoList(canvasState.redoList.filter((v, i) => i !== canvasState.redoList.length - 1)));
+  //     this.renderImage(redoUrl, ctx);
+  //   },
+  //   renderImage: (undoUrl: string, ctx: CanvasRenderingContext2D) => {
+  //     const img: HTMLImageElement = document.createElement('img');
+  //     const [W, H] = [window.innerWidth, window.innerHeight];
+  //     img.src = undoUrl;
+  //     img.onload = () => {
+  //       ctx.clearRect(0, 0, W, H);
+  //       ctx.drawImage(img, 0, 0, W, H, 0, 0, W, H);
+  //     }
+  //   }
+  // }), [canvasState.redoList, canvasState.roomId, canvasState.undoList, dispatch]);
 
   /**
    * On pointer down
@@ -142,7 +139,6 @@ function App() {
     setMousePosition({x: offsetX, y: offsetY});
   }
 
-
   /**
    * On pointer move
    * */
@@ -151,7 +147,7 @@ function App() {
     const {offsetX, offsetY} = nativeEvent;
     const prevPosition = mousePosition;
     setMousePosition({x: offsetX, y: offsetY});
-    history.saveState(canvasRef.current);
+    // history.saveState(canvasRef.current);
 
     socket.emit('draw', {
       fromX: prevPosition.x,
@@ -177,7 +173,7 @@ function App() {
    */
   const draw = useCallback((fromX: number, fromY: number, toX: number, toY: number, penColor: number, lineWidth: number) => {
     ctx.current!.beginPath();
-    ctx.current!.lineWidth = lineWidth;
+    ctx.current!.lineWidth = penSize[lineWidth];
     ctx.current!.strokeStyle = colors[penColor];
     ctx.current!.lineJoin = "round";
     ctx.current!.moveTo(fromX, fromY);
@@ -195,6 +191,7 @@ function App() {
    */
   const onCleanCanvas = () => {
     socket.emit('clean canvas', canvasState.roomId);
+
     cleanCanvas();
   }
 
@@ -204,6 +201,16 @@ function App() {
     dispatch(setUndoList([]));
     dispatch(setRedoList([]));
   }, [dispatch]);
+
+  const setErase = () => {
+    const whiteIndex = 9;
+    dispatch(changePenColor(whiteIndex));
+  }
+
+  const setPencil = () => {
+    const blackIndex = 0;
+    dispatch(changePenColor(blackIndex));
+  }
 
   /**
    * Download the draw
@@ -227,25 +234,26 @@ useEffect(() => {
   socket.on("cleaning canvas", () => {
     cleanCanvas();
   });
-  socket.on("undoing", () => {
-    history.undoState(canvasRef.current!, ctx.current!);
-  });
-  socket.on("redoing", () => {
-    history.restoreState(canvasRef.current!, ctx.current!);
-  });
-}, [draw, cleanCanvas, history]);
+  // socket.on("undoing", () => {
+  //   history.undoState(canvasRef.current!, ctx.current!);
+  // });
+  // socket.on("redoing", () => {
+  //   history.restoreState(canvasRef.current!, ctx.current!);
+  // });
+}, [draw, cleanCanvas]);
 
 return (
   <>
     {canvasState.createModalState && <CreateModal/>}
+    <PenSizeSelector />
     <Header
       downloadSketch={downloadSketch}
+      setErase={setErase}
+      setPencil={setPencil}
       cleanCanvas={onCleanCanvas}
-      undo={() => history.undo(canvasRef.current, ctx.current)}
-      redo={() => history.redo(canvasRef.current, ctx.current)}
     />
     <canvas
-      id="canvas"
+      id={css.canvas}
       style={{touchAction: 'none'}}
       onPointerDown={onStartDrawing}
       onPointerMove={onMove}
@@ -253,8 +261,6 @@ return (
       ref={canvasRef}
     />
     <Colorbar/>
-    {/*<PenSizeRange />*/}
-    {/*<Cursor />*/}
   </>
 );
 }
