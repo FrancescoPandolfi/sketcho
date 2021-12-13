@@ -34,10 +34,10 @@ const Header = ({downloadSketch, setPencil, setErase, cleanCanvas}: props) => {
     <div className={css.header}>
       <div className={css.logo}>Sketcho</div>
       <div>
-        <ToolButton action={setPencil} icon={<BsPencil/>}/>
-        <ToolButton action={setErase} icon={<CgErase/>}/>
-        <ToolButton action={cleanCanvas} icon={<CgTrash/>}/>
-        <ToolButton action={downloadSketch} icon={<CgSoftwareDownload/>}/>
+        <ToolButton clickAction={setPencil} selectable={true} icon={<BsPencil/>}/>
+        <ToolButton clickAction={setErase} selectable={true} icon={<CgErase/>}/>
+        <ToolButton clickAction={cleanCanvas} icon={<CgTrash/>}/>
+        <ToolButton clickAction={downloadSketch} icon={<CgSoftwareDownload/>}/>
       </div>
       <PillButton
         text="‍👨🏻‍ Invite buddy 👩🏾‍"

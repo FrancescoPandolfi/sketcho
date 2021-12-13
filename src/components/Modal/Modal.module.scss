@@ -1,3 +1,5 @@
+@import "../../styles/variables";
+
 .backdrop {
   background-color: rgba(0, 0, 0, 0.5);
   position: fixed;
@@ -15,13 +17,18 @@
 .modalContainer {
   background-color: white;
   padding: 15px;
-  width: 300px;
-  height: 200px;
   text-align: center;
   border-radius: 25px;
   animation-name: modal;
   animation-duration: .4s;
   animation-timing-function: ease;
+  p {
+    font-size: 20px;
+  }
+  p.link {
+    font-weight: bold;
+    color: $violet-main;
+  }
 }
 
 
