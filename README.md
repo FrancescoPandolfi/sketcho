@@ -1,4 +1,4 @@
-# ✏️  Switcho - Collaborative drawing app
+# ✏️  Switcho - Collaborative drawings
 
 ## Work in progress app: [Click me](https://sketcho.vercel.app/) 
 
