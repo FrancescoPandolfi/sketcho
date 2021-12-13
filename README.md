@@ -1,6 +1,6 @@
-## ✏️  Switcho - Collaborative drawing app
+# ✏️  Switcho - Collaborative drawing app
 
-# Work in progress app: [Click me](https://sketcho.vercel.app/) 
+## Work in progress app: [Click me](https://sketcho.vercel.app/) 
 
 Made with:
 
@@ -11,7 +11,6 @@ Made with:
 - Canvas API
 
 
-
 ## Running this Repo
 
 Download the source, open a terminal to the source folder and ...
@@ -20,7 +19,7 @@ Download the source, open a terminal to the source folder and ...
 npm install
 npm start
 ```
-Then navigato to backend folder and ...
+Then navigate to "backend" folder and ...
 
 ```
 npm install
