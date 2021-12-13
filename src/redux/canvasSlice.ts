@@ -7,6 +7,7 @@ export interface CanvasState {
   undoList: string[];
   createModalState: boolean;
   roomId: string | null;
+  activeButton: number
 }
 
 const initialState: CanvasState = {
@@ -15,7 +16,8 @@ const initialState: CanvasState = {
   redoList: [],
   undoList: [],
   createModalState: false,
-  roomId: null
+  roomId: null,
+  activeButton: 1
 }
 
 export const canvasSlice = createSlice({
@@ -39,6 +41,9 @@ export const canvasSlice = createSlice({
     },
     setRoomId: (state, action: PayloadAction<string>) => {
       state.roomId = action.payload
+    },
+    setActiveButton: (state, action: PayloadAction<number>) => {
+      state.activeButton = action.payload
     }
   }
 });
@@ -50,7 +55,8 @@ export const {
   setRedoList,
   setUndoList,
   setCreateModalState,
-  setRoomId
+  setRoomId,
+  setActiveButton
 } = canvasSlice.actions;
 
 export default canvasSlice.reducer;

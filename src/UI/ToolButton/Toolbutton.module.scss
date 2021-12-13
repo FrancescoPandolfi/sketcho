@@ -1,17 +1,18 @@
+@import "../../styles/variables";
+
 .btn {
-  //width: 30px;
-  //height: 30px;
   border: 0;
   cursor: pointer;
   color: white;
   font-size: 20px;
-  border-radius: 50%;
-  padding: 10px 12px 8px 12px;
-  margin-left: 15px;
+  padding: 8px 9px 5px 10px;
+  margin-left: 12px;
   background-color: unset;
 }
-.btnColor {
-  //background-image: linear-gradient(#7A36F9 0%, #7A36F9 51%, #6524e0 100%);
+.btnSelected {
+  background-color: white;
+  border-radius: 50%;
+  color: $violet-main;
 }
 
 .btn:first-child{
@@ -23,7 +24,6 @@
 }
 .btn:disabled {
   background-image: unset;
-  //background-color: gray;
   transform: unset;
 }
 

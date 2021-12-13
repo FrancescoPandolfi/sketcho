@@ -15,11 +15,9 @@ server.listen(process.env.PORT || 3001, () => {
 
 io.on('connection', (socket) => {
   socket.on('join room', (roomId) => {
-    console.log('join', roomId)
     socket.join(roomId);
   });
   socket.on('draw', (canvasData) => {
-    console.log('draw', canvasData)
     if (canvasData.roomId) {
       socket.to(canvasData.roomId).emit("drawing", canvasData);
     }
