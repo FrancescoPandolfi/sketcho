@@ -1,3 +1,28 @@
-✏️ Collaborative drawing app made with React, Redux, Node js, Express, Socket.io.
+## ✏️  Switcho - Collaborative drawing app
 
-# See the work in progress app here: https://sketcho.vercel.app/ 
+# Work in progress app: [Click me](https://sketcho.vercel.app/) 
+
+Made with:
+
+- React
+- Redux
+- Node.js
+- Socket.io
+- Canvas API
+
+
+
+## Running this Repo
+
+Download the source, open a terminal to the source folder and ...
+
+```
+npm install
+npm start
+```
+Then navigato to backend folder and ...
+
+```
+npm install
+npm start
+```
