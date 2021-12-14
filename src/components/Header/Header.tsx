@@ -1,6 +1,6 @@
 import css from "./Header.module.scss";
 import ToolButton from "../../UI/ToolButton/ToolButton";
-import {BsPencil, CgErase, CgSoftwareDownload, CgTrash} from "react-icons/all";
+import {BsBrush, CgErase, CgSoftwareDownload, CgTrash} from "react-icons/all";
 import React, {useCallback} from "react";
 import PillButton from "../../UI/PillButton/PillButton";
 import {useDispatch, useSelector} from "react-redux";
@@ -34,7 +34,7 @@ const Header = ({downloadSketch, setPencil, setErase, cleanCanvas}: props) => {
     <div className={css.header}>
       <div className={css.logo}>Sketcho</div>
       <div>
-        <ToolButton index={1} clickAction={setPencil} selectable={true} icon={<BsPencil/>}/>
+        <ToolButton index={1} clickAction={setPencil} selectable={true} icon={<BsBrush/>}/>
         <ToolButton index={2} clickAction={setErase} selectable={true} icon={<CgErase/>}/>
         <ToolButton index={3} clickAction={cleanCanvas} icon={<CgTrash/>}/>
         <ToolButton index={4} clickAction={downloadSketch} icon={<CgSoftwareDownload/>}/>
